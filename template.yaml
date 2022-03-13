@@ -1,0 +1,170 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: back-end functionalities of sample dynamodb app
+
+Globals:
+  Function:
+    Timeout: 30
+    CodeUri: src/
+    Runtime: python3.8
+    Architectures:
+      - x86_64
+
+Resources:
+  
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "BlogsItem"
+      AttributeDefinitions:
+        -
+          AttributeName: "PK"
+          AttributeType: "S"
+        -
+          AttributeName: "SK"
+          AttributeType: "S"
+        -
+          AttributeName: "publish_date"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "PK"
+          KeyType: "HASH"
+        -
+          AttributeName: "SK"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      GlobalSecondaryIndexes:
+        - IndexName: Listing_GSI
+          KeySchema:
+            -
+              AttributeName: "SK"
+              KeyType: "HASH"   
+            -
+              AttributeName: "publish_date"
+              KeyType: "RANGE"  
+          Projection:
+            NonKeyAttributes: [post_id, title, description]
+            ProjectionType: INCLUDE  
+          ProvisionedThroughput:
+            ReadCapacityUnits: "5"
+            WriteCapacityUnits: "5"   
+
+        - IndexName: Listing_GSI2
+          KeySchema:
+            -
+              AttributeName: "publish_date"
+              KeyType: "HASH"   
+            -
+              AttributeName: "SK"
+              KeyType: "RANGE"  
+          Projection:
+            NonKeyAttributes: [post_id, title, description]
+            ProjectionType: INCLUDE  
+          ProvisionedThroughput:
+            ReadCapacityUnits: "5"
+            WriteCapacityUnits: "5" 
+        # - IndexName: Date_GSI
+        #   KeySchema:
+        #     -
+        #       AttributeName: "SK"
+        #       KeyType: "HASH"   
+        #     -
+        #       AttributeName: "date"
+        #       KeyType: "RANGE"  
+        #   Projection:
+        #     NonKeyAttributes: [post_id, title, description]
+        #     ProjectionType: INCLUDE  
+        #   ProvisionedThroughput:
+        #     ReadCapacityUnits: "5"
+        #     WriteCapacityUnits: "5"   
+  
+  AddFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: add_fn.lambda_handler
+      Environment:
+        Variables:    
+          TABLE_NAME: !Ref DynamoTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoTable
+      Events:
+        InsertEvent:
+          Type: Api
+          Properties:
+            Path:  /add
+            Method: post
+
+  ListPostsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: list_fn.lambda_handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DynamoTable  
+          INDEX_NAME: Listing_GSI2
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoTable
+      Events:
+        CreateEvent:
+          Type: Api
+          Properties:
+            Path:  /list
+            Method: post
+
+  ReadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: read_fn.lambda_handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DynamoTable   
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoTable
+      Events:
+        ReadEvent:
+          Type: Api
+          Properties:
+            Path:  /read
+            Method: post
+
+  RemoveFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: remove_fn.lambda_handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DynamoTable     
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoTable
+      Events:
+        DeleteEvent:
+          Type: Api
+          Properties:
+            Path:  /remove
+            Method: post
+
+
+Outputs:
+
+  AddFunctionApi:
+    Description: "API Gateway endpoint URL for Prod stage for Add a post function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/add/"
+ 
+  ListPostsFunctionApi:
+    Description: "API Gateway endpoint URL for Prod stage for List Posts function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/list/"
+
+  ReadFunctionApi:
+    Description: "API Gateway endpoint URL for Prod stage for Read a post function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/read/"
+
+  RemoveFunctionApi:
+    Description: "API Gateway endpoint URL for Prod stage for Remove post function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/remove/"
