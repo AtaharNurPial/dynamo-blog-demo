@@ -5,9 +5,9 @@
 codeuri = "/home/pial/Edu/Spring22/Internship/sam-dynamodb/src"
 runtime = "python3.8"
 architecture = "x86_64"
-source_hash = "eea45297ae79e092c22c619ebf2bb066ae318c77fa900e11f26a1103da4f3f39"
+source_hash = "eb42f4fd0efb642807505d689172e3f57f309c771bc544b0528c8bf3064ee2be"
 manifest_hash = ""
 packagetype = "Zip"
-functions = ["AddFunction", "ListPostsFunction", "ReadFunction", "RemoveFunction"]
+functions = ["AddFunction", "ListPostsFunction", "ListPostsByUserFunction", "ReadFunction", "RemoveFunction"]
 
 [layer_build_definitions]

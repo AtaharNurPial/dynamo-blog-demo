@@ -18,8 +18,7 @@ class Blog_Item(BaseModel):
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
         if self.publish_date == '':
-            self.publish_date = str(datetime.now())
-            # self.publish_date = publish_date.strftime()
+            self.publish_date = str(datetime.now().strftime("%Y-%m-%d"))
             # print(publish_date)
         self.PK = f"{POST_PREFIX}{self.post_id}"
         self.SK = f"{OWNER_PREFIX}{self.owner_id}"

@@ -66,20 +66,21 @@ Resources:
           ProvisionedThroughput:
             ReadCapacityUnits: "5"
             WriteCapacityUnits: "5" 
-        # - IndexName: Date_GSI
-        #   KeySchema:
-        #     -
-        #       AttributeName: "SK"
-        #       KeyType: "HASH"   
-        #     -
-        #       AttributeName: "date"
-        #       KeyType: "RANGE"  
-        #   Projection:
-        #     NonKeyAttributes: [post_id, title, description]
-        #     ProjectionType: INCLUDE  
-        #   ProvisionedThroughput:
-        #     ReadCapacityUnits: "5"
-        #     WriteCapacityUnits: "5"   
+
+        - IndexName: Listing_GSI3
+          KeySchema:
+            -
+              AttributeName: "SK"
+              KeyType: "HASH"   
+            -
+              AttributeName: "PK"
+              KeyType: "RANGE"  
+          Projection:
+            NonKeyAttributes: [post_id, title, description]
+            ProjectionType: INCLUDE  
+          ProvisionedThroughput:
+            ReadCapacityUnits: "5"
+            WriteCapacityUnits: "5"  
   
   AddFunction:
     Type: AWS::Serverless::Function
@@ -114,6 +115,24 @@ Resources:
           Type: Api
           Properties:
             Path:  /list
+            Method: post
+
+  ListPostsByUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: list_by_user.lambda_handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DynamoTable  
+          INDEX_NAME: Listing_GSI3
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoTable
+      Events:
+        CreateEvent:
+          Type: Api
+          Properties:
+            Path:  /list_post_by_user
             Method: post
 
   ReadFunction:
@@ -160,6 +179,10 @@ Outputs:
   ListPostsFunctionApi:
     Description: "API Gateway endpoint URL for Prod stage for List Posts function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/list/"
+
+  ListPostsByUserFunctionApi:
+    Description: "API Gateway endpoint URL for Prod stage for List Posts by User function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/list_post_by_user/"
 
   ReadFunctionApi:
     Description: "API Gateway endpoint URL for Prod stage for Read a post function"
