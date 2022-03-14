@@ -29,7 +29,6 @@ def lambda_handler(event, context):
         response = list_post_by_user(sk)
         print(response)
         items = response['Items']
-        print(items)
         return{
             'statusCode': 200,
             'body': json.dumps({

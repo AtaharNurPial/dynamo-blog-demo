@@ -25,7 +25,6 @@ def lambda_handler(event, context):
         response = list_post(publish_date)
         print(response)
         items = response['Items']
-        print(items)
         return{
             'statusCode': 200,
             'body': json.dumps({

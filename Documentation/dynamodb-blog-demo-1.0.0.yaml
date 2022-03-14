@@ -1,0 +1,202 @@
+swagger: "2.0"
+info:
+  description: "This is a sample dynamodb-blog server."
+  version: "1.0.0"
+  title: "dynamodb-blog-app"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+# host: "v32jg8k7v3.execute-api.us-east-2.amazonaws.com"
+# basePath: "/Prod"
+tags:
+- name: "Table"
+  description: "Operations on the DB Table"
+schemes:
+- "https"
+- "http"
+
+paths:
+  
+  /add:
+    post:
+      tags:
+      - "Table"
+      summary: "Add a new post to the database"
+      description: ""
+      operationId: "addPost"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "post object that needs to be added to the database"
+        required: true
+        schema:
+          $ref: "#/definitions/Blog_Item"
+      responses:
+        "200":
+          description: "Item Inserted"
+        "400":
+          description: "Invalid input"
+
+  /list:
+    post:
+      tags:
+      - "Table"
+      summary: "list by date"
+      description: "lists all the posts that were published in a specific date"
+      operationId: "listPosts"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "List all items of a restaurant"
+        required: true
+        schema:
+          $ref: "#/definitions/Date"
+      responses:
+        "200":
+          description: "List of all posts"
+        "400":
+          description: "Invalid input"
+
+  /list_post_by_user:
+    post:
+      tags:
+      - "Table"
+      summary: "list by user"
+      description: "lists all the posts of a specific user"
+      operationId: "listPostsbyUser"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "List all post of an user"
+        required: true
+        schema:
+          $ref: "#/definitions/SK"
+      responses:
+        "200":
+          description: "List of all posts"
+        "400":
+          description: "Invalid input"
+
+  /read:
+    post:
+      tags:
+      - "Table"
+      summary: "read a single post from the database"
+      description: ""
+      operationId: "readPost"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Displays a post from the database"
+        required: true
+        schema:
+          $ref: "#/definitions/KeyIDs"
+      responses:
+        "200":
+          description: "Single Item"
+        "400":
+          description: "Validation Error"
+          
+  /remove:
+    post:
+      tags:
+      - "Table"
+      summary: "Remove a post from the database"
+      description: ""
+      operationId: "removePost"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Remove a post from the database"
+        required: true
+        schema:
+          $ref: "#/definitions/KeyIDs"
+      responses:
+        "200":
+          description: "Item Deleted"
+        "400":
+          description: "Validation Error"
+
+definitions:
+
+  KeyIDs:
+    type: "object"
+    properties:
+      pk:
+        type: "string"
+      sk:
+        type: "string"
+    xml:
+      name: "KeyIDs"
+  
+  Date:
+    type: "object"
+    properties:
+      publish_date:
+        type: "string"
+    xml:
+      name: "Date"
+      
+  SK:
+    type: "object"
+    properties:
+      sk:
+        type: "string"
+    xml:
+      name: "Date"
+  
+  Blog_Item:
+    type: "object"
+    required:
+    - "post_id"
+    - "owner_id"
+    properties:
+      PK:
+        type: "string"
+      SK:
+        type: "string"
+      post_id:
+        type: "string"
+      publish_date:
+        type: "string"
+      owner_id:
+        type: "string"
+      title:
+        type: "string"
+      description:
+        type: "string"
+    xml:
+      name: "Blog_Item"
+# Added by API Auto Mocking Plugin
+host: virtserver.swaggerhub.com
+basePath: /AtaharNurPial/dynamodb-blog-demo/1.0.0
